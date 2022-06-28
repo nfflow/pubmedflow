@@ -1,1 +1,1 @@
-from pubmedflow import *
+from .pubmedflow import *
