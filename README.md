@@ -3,7 +3,7 @@
 <p align="center"> Contribute and Support </p>
 
 
-[![GitHub license](https://img.shields.io/badge/License-Creative%20Commons%20Attribution%204.0%20International-blue)](https://github.com/nfflow/pubmedflow/blob/master/LICENSE)
+[![License:MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub commit](https://img.shields.io/github/last-commit/nfflow/pubmedflow)](https://github.com/nfflow/pubmedflow/commits/main)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
@@ -22,3 +22,4 @@
 ### How to use api?
 
 - Follow tutorial in Examples folder
+
