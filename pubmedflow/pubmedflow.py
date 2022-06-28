@@ -6,12 +6,16 @@ from pathlib import Path
 import pubmed_parser as pp
 import pandas as pd
 import itertools
+import json
+import uuid
 import os, glob
-
 from tqdm import tqdm
+from .utils import *
 from metapub import FindIt
 from bs4 import BeautifulSoup
 from scidownl import scihub_download
+from datetime import datetime, date
+
 
 shutup.please()
 
@@ -20,16 +24,27 @@ class LazyPubmed(object):
     
     def __init__(self):
         
-        Path('Pubmed_data/pdfs/').mkdir(parents=True, 
+        # creating folders for storing data 
+        # ---------------------------------------------------------
+        
+        self.folder_uuid    = str(uuid.uuid4())
+        self.raw_pdf_path   = f'Pubmed_data/{self.folder_uuid}/raw_pdfs/'
+        self.final_df       = f'Pubmed_data/{self.folder_uuid}/final_df/'
+        self.raw_abs_path   = f'Pubmed_data/{self.folder_uuid}/raw_abstracts/'
+        self.meta_data_path = f'Pubmed_data/{self.folder_uuid}/meta_data/'
+        self.xml2pdf_path   = f'Pubmed_data/{self.folder_uuid}/xml2df/'
+        
+        Path(self.raw_pdf_path).mkdir(parents=True, 
                                  exist_ok=True)
-        Path('Pubmed_data/abstracts/').mkdir(parents=True, 
+        Path(self.raw_abs_path).mkdir(parents=True, 
                                  exist_ok=True)
-
-        Path('Pubmed_data/meta_data/').mkdir(parents=True, 
+        Path(self.meta_data_path).mkdir(parents=True, 
                                  exist_ok=True)
-
-        Path('Pubmed_data/xmldf/').mkdir(parents=True, 
+        Path(self.xml2pdf_path).mkdir(parents=True, 
                                  exist_ok=True)
+        Path(self.final_df).mkdir(parents=True, 
+                                 exist_ok=True)
+        # ---------------------------------------------------------
         
         self.user_agent_list = [
                                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
@@ -81,32 +96,6 @@ class LazyPubmed(object):
         today       = currentDate.strftime('%Y/%m/%d')
         return today
 
-
-
-    def get_records(self, 
-                    query       = None, 
-                    max_records = None):
-                    
-        if query:
-
-            if max_records:
-                search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?sort=relevance&db=pubmed&term={query}&retmode=JSON&retmax={max_records}"
-            else:
-                search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?sort=relevance&db=pubmed&term={query}&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
-        else:
-            search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
-                
-        
-        search_r      = requests.post(search_url, verify = False)
-        search_data   = search_r.json()
-        webenv        = search_data["esearchresult"]['webenv']
-        total_records = int(search_data["esearchresult"]['count'])
-        
-        return {'total_records': total_records, 
-                'webenv'       : webenv, 
-                'search_data'  : search_data}
-
-    
         
     def pmc(self, url):
         """Download pdf from pmc website"""
@@ -124,7 +113,7 @@ class LazyPubmed(object):
         """save pdf in local folder"""
         
         pdf_request = self.request_head(pdf_url)
-        with open(f'Pubmed_data/pdfs/{pmid}.pdf', 'wb') as f:
+        with open(f'{self.raw_pdf_path}{pmid}.pdf', 'wb') as f:
             f.write(pdf_request.content)
         return 0
     
@@ -132,7 +121,7 @@ class LazyPubmed(object):
         """scihub search"""
         
         paper_type = "pmid"
-        out        = f"./Pubmed_data/pdfs/{pmid}.pdf"
+        out        = f'{self.raw_pdf_path}{pmid}.pdf'
         scihub_download(pmid, paper_type = paper_type, out=out)
         
     
@@ -141,6 +130,12 @@ class LazyPubmed(object):
         
         downloadble_url = {}
         not_downloaded  = {}
+        
+
+        pdf_count       = len(pmids)
+        print(f"Total pdf downloading : {pdf_count}.. \n")
+
+        
         for pmid in tqdm(pmids):
             
             try:
@@ -167,7 +162,7 @@ class LazyPubmed(object):
             
             
             except Exception as e:
-                print(e)
+                pass
         
         
         return json.dumps({
@@ -182,60 +177,76 @@ class LazyPubmed(object):
         return today
 
 
-    def write_json(path_name, data, name):
+    def write_json(self, path_name, data, name):
         """Write json data"""
 
-        with open(f'{path_name}/{name}.json', 'w', encoding='utf-8') as f:
+        with open(f'{path_name}{name}.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
         return 0
 
 
-    def get_records(query = None):
+    def get_records(self, query = None):
+        """get fetch result and ids from ncbi website using api"""
         
-            if query:
-                search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?sort=relevance&db=pubmed&term={query}&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
-            else:
-                search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
-    
-            search_r      = requests.post(search_url, verify = False)
-            search_data   = search_r.json()
-            
-            webenv        = search_data["esearchresult"]['webenv']
-            total_records = int(search_data["esearchresult"]['count'])
-            
-            return {'total_records': total_records, 
-                    'webenv'       : webenv, 
-                    'search_data'  : search_data}
+        
+        if query:
+            search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?sort=relevance&db=pubmed&term={query}&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
+        else:
+            search_url    = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
+
+        search_r      = requests.post(search_url, verify = False)
+        search_data   = search_r.json()
+
+        webenv        = search_data["esearchresult"]['webenv']
+        total_records = int(search_data["esearchresult"]['count'])
+
+        return {'total_records': total_records, 
+                'webenv'       : webenv, 
+                'search_data'  : search_data}
 
 
-    def fetch(key, 
-            query = None):
+    def fetch(self, query,
+                    key, 
+                    max_documents = None):
+        """main function to do multi task -> fetch ids, based on ids fetch abstracts"""
         
         
         all_records = self.get_records(query)
         webenv      = all_records['webenv']
         all_rec     = all_records['total_records']
         
-        print(all_rec)
-        fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={key}&retmax=9999&retmode=xml&query_key=1&webenv="+webenv
+        if max_documents:
+            all_rec   = max_documents
+            fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={key}&retmax={max_documents}&retmode=xml&query_key=1&webenv="+webenv
+        else:
+            fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={key}&retmax=9999&retmode=xml&query_key=1&webenv="+webenv
+        
+        print("-------------------------------------------\n")
+        print(f" Fetching total documents -> {all_rec}..\n")
+        print("-------------------------------------------\n")
 
         for i in tqdm(range(0, all_rec, 10000)):
             try:
                 meta_data = {}
                 u_id      = str(uuid.uuid4())
-                payload = fetch_url+"&retstart="+str(i)
-                print("Getting this URL: ", payload)
+                payload   = fetch_url+"&retstart="+str(i)
+                
+                print(f"Getting this URL: {payload} \n")
+                
                 fetch_r = requests.post(payload, verify = False)
-                f = open('./Pubmed_data/abstracts/pubmed_batch_'+ u_id + str(i) + '_to_' + str(i+all_rec) + ".xml", 'wb')
+                pre_name = f'{self.raw_abs_path}/pubmed_batch_{u_id}_{str(i)}_to_{str(i+all_rec)}.xml'
+                
+                f = open(pre_name, 'wb')
                 f.write(fetch_r.content)
                 f.close()
+                
                 meta_data['uid']    = u_id
                 meta_data['query']  = query
                 meta_data['url']    = payload
                 meta_data['total']  = all_rec
                 meta_data['iter']   = i
                 
-                write_json('Pubmed_data/meta_data', meta_data, u_id)
+                self.write_json(self.meta_data_path, meta_data, u_id)
                 
             except Exception as e:
                 with open('exceptions','a') as f:
@@ -243,35 +254,32 @@ class LazyPubmed(object):
                 pass
             
         return 0
+    
+    
+    def pubmed_search(self, query, key,
+                      max_documents = None, 
+                      download_pdf  = True, 
+                      scihub        = False):
+        """function to fetch ids, fetch abstracts and fetch respective pdf files"""
+
+        fetch_ids        = self.fetch(query, key,
+                                      max_documents = max_documents)
+        final_df         = xml2df(self.raw_abs_path, self.xml2pdf_path)
+        final_df         = final_df[final_df['pmid'].notna()]
+        final_df['pmid'] = final_df['pmid'].apply(lambda x: int(x))
 
 
-    def parse_xml(self, file):
-        dicts_out = pp.parse_medline_xml(file)
-        return dicts_out
 
 
-    def xml2df(self, dir_name):
+        pids      = list(set(list(final_df['pmid'])))
 
-        all_files = glob.glob("./Pubmed_data/abstracts/*xml")
-        u_id      = str(uuid.uuid4())
+        if download_pdf:
+            self.download_pdf(pids, save = True, scihub = scihub)
+            dart             = get_final_data(self.raw_pdf_path)
+            dart             = dart[dart['pmid'].notna()]
+            dart['pmid']     = dart['pmid'].apply(lambda x: int(x))
+            final_df         = pd.merge(final_df, dart, on = 'pmid', how = 'left')
+
         
-        df_list = []
-        
-        try:
-            for i in tqdm(all_files):
-                raw_df = self.parse_xml(i)
-                df     = pd.DataFrame(raw_df)
-                df_list.append(df)
-
-            final_df = pd.concat(df_list)
-            final_df.to_csv(f'./Pubmed_data/xmldf/{u_id}.csv',index=False)
-            final_df   = pd.read_csv(f'./Pubmed_data/xmldf/{u_id}.csv')
-
-        except Exception as e:
-            print(e)
-            pass
-        
-        # it will replace blank will NaN now load again and select without NaN
-        final_df   = final_df[final_df['abstract'].notna()].reset_index(drop=True)
-        final_df.to_csv(f'./Pubmed_data/xmldf/{u_id}.csv',index=False)
-        return "saved"
+        final_df.to_csv(f'{self.final_df}final_df.csv')
+        return final_df
