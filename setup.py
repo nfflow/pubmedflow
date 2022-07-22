@@ -1,0 +1,28 @@
+import setuptools
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+install_requires = ["shutup",
+                    "numpy",
+                    "pandas",
+                    "bs4",
+                    "metapub",
+                    "scidownl",
+                    "pdfminer",
+                    "pubmed_parser"]
+setuptools.setup(
+    name="pubmedflow",
+    version="0.0.1",
+    author="Abhijith Neil Abraham",
+    author_email="abhijithneilabrahampk@gmail.com",
+    description="Data Collection from pubmed made easy",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    license='MIT License',
+    url="https://github.com/nfflow/pubmedflow",
+    install_requires=install_requires,
+    packages=setuptools.find_packages(),
+    python_requires='>=3.6',
+    include_package_data=True
+)
