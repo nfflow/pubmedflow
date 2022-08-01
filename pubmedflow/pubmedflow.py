@@ -1,3 +1,10 @@
+"""
+    This class is to implement the core pubmed functions, download the articles and query based on keywords
+    @author: Aaditya(Ankit) <aadityaura@gmail.com>
+    @date created: 27/06/2022
+    @date last modified: 02/08/2022
+"""
+
 import shutup
 import random
 import requests
