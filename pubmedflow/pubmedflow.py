@@ -1,14 +1,10 @@
 import shutup
 import random
 import requests
-from lxml import etree
 from pathlib import Path
-import pubmed_parser as pp
 import pandas as pd
-import itertools
 import json
 import uuid
-import os, glob
 from tqdm import tqdm
 from .utils import *
 from metapub import FindIt
