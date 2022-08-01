@@ -1,3 +1,10 @@
+"""
+    This class is to implement the util functions for pubmed main class
+    @author: Aaditya(Ankit) <aadityaura@gmail.com>
+    @date created: 27/06/2022
+    @date last modified: 02/08/2022
+"""
+
 import os
 import re
 import numpy as np
