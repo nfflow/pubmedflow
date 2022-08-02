@@ -17,67 +17,63 @@ from .utils import *
 from metapub import FindIt
 from bs4 import BeautifulSoup
 from scidownl import scihub_download
-from datetime import datetime, date
 
 
 shutup.please()
 
 
 class LazyPubmed(object):
-    
+
     def __init__(self):
-        
-        # creating folders for storing data 
+
+        # creating folders for storing data
         # ---------------------------------------------------------
-        
-        self.folder_uuid    = str(uuid.uuid4())
-        self.raw_pdf_path   = f'Pubmed_data/{self.folder_uuid}/raw_pdfs/'
-        self.final_df       = f'Pubmed_data/{self.folder_uuid}/final_df/'
-        self.raw_abs_path   = f'Pubmed_data/{self.folder_uuid}/raw_abstracts/'
+
+        self.folder_uuid = str(uuid.uuid4())
+        self.raw_pdf_path = f'Pubmed_data/{self.folder_uuid}/raw_pdfs/'
+        self.final_df = f'Pubmed_data/{self.folder_uuid}/final_df/'
+        self.raw_abs_path = f'Pubmed_data/{self.folder_uuid}/raw_abstracts/'
         self.meta_data_path = f'Pubmed_data/{self.folder_uuid}/meta_data/'
-        self.xml2pdf_path   = f'Pubmed_data/{self.folder_uuid}/xml2df/'
-        
-        Path(self.raw_pdf_path).mkdir(parents=True, 
-                                 exist_ok=True)
-        Path(self.raw_abs_path).mkdir(parents=True, 
-                                 exist_ok=True)
-        Path(self.meta_data_path).mkdir(parents=True, 
-                                 exist_ok=True)
-        Path(self.xml2pdf_path).mkdir(parents=True, 
-                                 exist_ok=True)
-        Path(self.final_df).mkdir(parents=True, 
-                                 exist_ok=True)
+        self.xml2pdf_path = f'Pubmed_data/{self.folder_uuid}/xml2df/'
+
+        Path(self.raw_pdf_path).mkdir(parents=True,
+                                      exist_ok=True)
+        Path(self.raw_abs_path).mkdir(parents=True,
+                                      exist_ok=True)
+        Path(self.meta_data_path).mkdir(parents=True,
+                                        exist_ok=True)
+        Path(self.xml2pdf_path).mkdir(parents=True,
+                                      exist_ok=True)
+        Path(self.final_df).mkdir(parents=True,
+                                  exist_ok=True)
         # ---------------------------------------------------------
-        
         self.user_agent_list = [
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
-                                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0',
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0',
-                                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0',
-                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36 OPR/88.0.4412.27',   
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0',
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36 OPR/88.0.4412.27',   
                                 ]
-    
-    
+
     def request_head(self, url):
         """Request function for urls"""
-        
-        headers               = requests.utils.default_headers()
+
+        headers = requests.utils.default_headers()
         headers['User-Agent'] = random.choice(self.user_agent_list)
-        r                     = requests.get(url, headers=headers, 
-                                             allow_redirects=True, 
-                                             verify = False)
+        r = requests.get(url, headers=headers,
+                         allow_redirects=True,
+                         verify=False)
         return r
-    
-    
+
     def pdf_links(self, pmid):
         """Get pdf links from Pubmed website"""
-        
-        
-        data                  = {}
+
+
+        data = {}
         url                   = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
         url_request           = self.request_head(url)
         soup                  = BeautifulSoup(url_request.text,'html.parser')
