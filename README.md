@@ -32,12 +32,14 @@ folder_name | Optional, str | path to store output data
 ### Quick Start
 ```python
 
+import eutils
 from pubmedflow import LazyPubmed
+
 
 pb        = LazyPubmed()
 df_result = pb.pubmed_search(query         = 'Chronic',
-                             key           = "your_api_key",
-                             max_documents = 10,
+                             key           = "api_key",
+                             max_documents = 2,
                              download_pdf  = True, 
                              scihub        = False)
                     
