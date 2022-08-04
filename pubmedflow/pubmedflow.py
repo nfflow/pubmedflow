@@ -14,6 +14,7 @@ import json
 import uuid
 from tqdm import tqdm
 from .utils import *
+from datetime import date
 from metapub import FindIt
 from bs4 import BeautifulSoup
 from scidownl import scihub_download
