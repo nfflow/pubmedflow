@@ -9,7 +9,7 @@ install_requires = ["shutup",
                     "bs4",
                     "metapub",
                     "scidownl",
-                    "pdfminer",
+                    "pdfminer3",
                     "pubmed_parser"]
 setuptools.setup(
     name="pubmedflow",
