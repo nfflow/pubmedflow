@@ -24,17 +24,18 @@ shutup.please()
 
 class LazyPubmed(object):
 
-    def __init__(self):
+    def __init__(self, folder_name='pubmed_data'):
 
         # creating folders for storing data
         # ---------------------------------------------------------
 
         self.folder_uuid = str(uuid.uuid4())
-        self.raw_pdf_path = f'Pubmed_data/{self.folder_uuid}/raw_pdfs/'
-        self.final_df = f'Pubmed_data/{self.folder_uuid}/final_df/'
-        self.raw_abs_path = f'Pubmed_data/{self.folder_uuid}/raw_abstracts/'
-        self.meta_data_path = f'Pubmed_data/{self.folder_uuid}/meta_data/'
-        self.xml2pdf_path = f'Pubmed_data/{self.folder_uuid}/xml2df/'
+        self.folder_name = folder_name
+        self.raw_pdf_path = f'{self.folder_name}/{self.folder_uuid}/raw_pdfs/'
+        self.final_df = f'{self.folder_name}/{self.folder_uuid}/final_df/'
+        self.raw_abs_path = f'{self.folder_name}/{self.folder_uuid}/raw_abstracts/'
+        self.meta_data_path = f'{self.folder_name}/{self.folder_uuid}/meta_data/'
+        self.xml2pdf_path = f'{self.folder_name}/{self.folder_uuid}/xml2df/'
 
         Path(self.raw_pdf_path).mkdir(parents=True,
                                       exist_ok=True)
