@@ -21,11 +21,16 @@
 
 ### How to use api?
 
+Arguments:   
+Name | Input | Description 
+ ----------- | ----------- |  -----------
+folder_name | Optional, str | path to store output data 
+
 Sample query :   
 ```
 
 from pubmedflow import LazyPubmed
-pb        = LazyPubmed()
+pb        = LazyPubmed(folder_name=folder_name)
 
 result    = pb.fetch(query = "lncRNA",
                     key = "your_api_key", 
