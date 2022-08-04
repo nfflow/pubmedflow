@@ -6,8 +6,10 @@
 [![License:MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub commit](https://img.shields.io/github/last-commit/nfflow/pubmedflow)](https://github.com/nfflow/pubmedflow/commits/main)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Open All Collab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/188cWcZrBRVGAF3Dp_5uswmLgbBNKSioB?usp=sharing)
 
-### Features
+
+### 🎮 Features
 
 - fetch pubmed ids (pmids) based on keyword query (supports multiple keywords query)
 - Fetch Abstract of research papers from pubmed based on pmids
@@ -26,15 +28,18 @@ Name | Input | Description
  ----------- | ----------- |  -----------
 folder_name | Optional, str | path to store output data 
 
-Sample query :   
-```
+
+### Quick Start
+```python
 
 from pubmedflow import LazyPubmed
-pb        = LazyPubmed(folder_name=folder_name)
 
-result    = pb.fetch(query = "lncRNA",
-                    key = "your_api_key", 
-                    max_documents = 5)
+pb        = LazyPubmed()
+df_result = pb.pubmed_search(query         = 'Chronic',
+                             key           = "your_api_key",
+                             max_documents = 10,
+                             download_pdf  = True, 
+                             scihub        = False)
                     
 ```
 
