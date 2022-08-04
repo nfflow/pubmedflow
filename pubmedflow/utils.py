@@ -7,7 +7,6 @@
 
 import os
 import re
-import numpy as np
 from pathlib import Path
 import pubmed_parser as pp
 import pandas as pd
