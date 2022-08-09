@@ -36,7 +36,7 @@ import eutils
 from pubmedflow import LazyPubmed
 
 
-pb        = LazyPubmed()
+pb        = LazyPubmed(folder_name=folder_name)
 df_result = pb.pubmed_search(query         = 'Chronic',
                              key           = "api_key",
                              max_documents = 2,
