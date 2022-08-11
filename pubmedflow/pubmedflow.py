@@ -17,7 +17,7 @@ from .utils import *
 from metapub import FindIt
 from bs4 import BeautifulSoup
 from scidownl import scihub_download
-
+from datetime import date
 
 shutup.please()
 
@@ -256,10 +256,11 @@ class LazyPubmed(object):
         return 0
     
     
-    def pubmed_search(self, query, key,
+    def pubmed_download(self, query, key,
                       max_documents = None, 
                       download_pdf  = True, 
-                      scihub        = False):
+                      scihub        = False,
+                      ):
         """function to fetch ids, fetch abstracts and fetch respective pdf files"""
 
         fetch_ids        = self.fetch(query, key,
@@ -283,3 +284,19 @@ class LazyPubmed(object):
         
         final_df.to_csv(f'{self.final_df}final_df.csv')
         return final_df
+    
+    def pubmed_qa(self,title_query,
+                      qa_query, key,
+                      max_documents = None, 
+                      download_pdf  = True, 
+                      scihub        = False):
+        final_df = self.pubmed_download(title_query, key,
+                                        max_documents=max_documents,
+                                        download_pdf=download_pdf,
+                                        scihub=scihub)
+        from nfmodelapis.text.question_answering import QAPipeline
+        pipe = QAPipeline(final_df)
+        res = pipe.batch_qa(qa_query, 'pdf_content')
+        return res
+        
+        
