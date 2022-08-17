@@ -25,7 +25,7 @@ shutup.please()
 
 class LazyPubmed(object):
 
-    def __init__(self, folder_name='pubmed_data'):
+    def __init__(self, folder_name='pubmed_data', api_key = ''):
 
         # creating folders for storing data
         # ---------------------------------------------------------
@@ -37,6 +37,7 @@ class LazyPubmed(object):
         self.raw_abs_path = f'{self.folder_name}/{self.folder_uuid}/raw_abstracts/'
         self.meta_data_path = f'{self.folder_name}/{self.folder_uuid}/meta_data/'
         self.xml2pdf_path = f'{self.folder_name}/{self.folder_uuid}/xml2df/'
+        self.key          = api_key
 
         Path(self.raw_pdf_path).mkdir(parents=True,
                                       exist_ok=True)
@@ -207,7 +208,6 @@ class LazyPubmed(object):
 
 
     def fetch(self, query,
-                    key, 
                     max_documents = None):
         """main function to do multi task -> fetch ids, based on ids fetch abstracts"""
         
@@ -218,9 +218,9 @@ class LazyPubmed(object):
         
         if max_documents:
             all_rec   = max_documents
-            fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={key}&retmax={max_documents}&retmode=xml&query_key=1&webenv="+webenv
+            fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={self.key}&retmax={max_documents}&retmode=xml&query_key=1&webenv="+webenv
         else:
-            fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={key}&retmax=9999&retmode=xml&query_key=1&webenv="+webenv
+            fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={self.key}&retmax=9999&retmode=xml&query_key=1&webenv="+webenv
         
         print("-------------------------------------------\n")
         print(f" Fetching total documents -> {all_rec}..\n")
@@ -257,15 +257,14 @@ class LazyPubmed(object):
         return 0
     
     
-    def pubmed_download(self, query, key,
+    def pubmed_download(self, query,
                       max_documents = None, 
                       download_pdf  = True, 
                       scihub        = False,
                       ):
         """function to fetch ids, fetch abstracts and fetch respective pdf files"""
 
-        fetch_ids        = self.fetch(query, key,
-                                      max_documents = max_documents)
+        fetch_ids        = self.fetch(query, max_documents = max_documents)
         final_df         = xml2df(self.raw_abs_path, self.xml2pdf_path)
         final_df         = final_df[final_df['pmid'].notna()]
         final_df['pmid'] = final_df['pmid'].apply(lambda x: int(x))
@@ -287,12 +286,10 @@ class LazyPubmed(object):
         return final_df
     
     def pubmed_qa(self,title_query,
-                      qa_query, key,
-                      max_documents = None, 
+                      qa_query, max_documents = None, 
                       download_pdf  = True, 
                       scihub        = False):
-        final_df = self.pubmed_download(title_query, key,
-                                        max_documents=max_documents,
+        final_df = self.pubmed_download(title_query, max_documents=max_documents,
                                         download_pdf=download_pdf,
                                         scihub=scihub)
         from nfmodelapis.text.question_answering import QAPipeline
@@ -302,12 +299,10 @@ class LazyPubmed(object):
     
     def pubmed_summarize(self,
                           title_query,
-                          key,
                           max_documents = None, 
                           download_pdf  = True,
                           scihub        = False):
-        final_df = self.pubmed_download(title_query, key,
-                                        max_documents=max_documents,
+        final_df = self.pubmed_download(title_query, max_documents=max_documents,
                                         download_pdf=download_pdf,
                                         scihub=scihub)
         from nfmodelapis.text.summarization import SummarizationPipeline
