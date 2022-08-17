@@ -298,5 +298,20 @@ class LazyPubmed(object):
         pipe = QAPipeline(final_df)
         res = pipe.batch_qa(qa_query, 'pdf_content')
         return res
+    
+    def pubmed_summarize(self,
+                          title_query,
+                          key,
+                          max_documents = None, 
+                          download_pdf  = True,
+                          scihub        = False):
+        final_df = self.pubmed_download(title_query, key,
+                                        max_documents=max_documents,
+                                        download_pdf=download_pdf,
+                                        scihub=scihub)
+        from nfmodelapis.text.summarization import SummarizationPipeline
+        pipe = SummarizationPipeline(final_df)
+        res = pipe.batch_summarize('pdf_content')
+        return res
         
         
