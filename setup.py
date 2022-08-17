@@ -24,5 +24,6 @@ setuptools.setup(
     install_requires=install_requires,
     packages=setuptools.find_packages(),
     python_requires='>=3.6',
-    include_package_data=True
+    include_package_data=True,
+    extras_require={"qa": ["nfmodelapis"]},
 )
