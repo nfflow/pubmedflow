@@ -30,6 +30,9 @@ folder_name | Optional, str | path to store output data
 
 
 ### Quick Start
+
+#### Download pubmed articles as PDF and DataFrame -
+
 ```python
 
 import eutils
@@ -37,13 +40,49 @@ from pubmedflow import LazyPubmed
 
 
 pb        = LazyPubmed(folder_name=folder_name)
-df_result = pb.pubmed_search(query         = 'Chronic',
+df_result = pb.pubmed_download(query         = 'Chronic',
                              key           = "api_key",
                              max_documents = 2,
                              download_pdf  = True, 
                              scihub        = False)
                     
 ```
+#### Download articles and do question answering on the downloaded text to get answer spans from each article:
+
+```python
+
+import eutils
+from pubmedflow import LazyPubmed
+
+
+pb        = LazyPubmed(folder_name=folder_name)
+qa_results = pb.pubmed_qa(title_query = 'Chronic',
+                          qa_query = 'What are the chronic diseases',
+                          key      = "api_key",
+                          max_documents = 2,
+                          download_pdf  = True, 
+                          scihub        = False)
+ print(qa_results)
+ ```
+ 
+ #### Download articles and summarise each of them
+ 
+ ```python
+ 
+import eutils
+from pubmedflow import LazyPubmed
+
+
+pb        = LazyPubmed(folder_name=folder_name)
+summ_results = pb.pubmed_summarise(title_query='Chronic',
+                                  qa_query='What are the chronic diseases',
+                                  key= "api_key",
+                                  max_documents = 2,
+                                  download_pdf = True, 
+                                  scihub = False)
+ print(summ_results)
+ ```
+ 
 
 
 
