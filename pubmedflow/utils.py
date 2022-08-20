@@ -4,38 +4,29 @@
     @date created: 27/06/2022
     @date last modified: 02/08/2022
 """
-import os
 import re
-from pathlib import Path
 import pubmed_parser as pp
 import pandas as pd
 from tqdm import tqdm
 import io
 import uuid
-import os
 import glob
 
-from pdfminer3.layout import LAParams, LTTextBox
+from pdfminer3.layout import LAParams
 from pdfminer3.pdfpage import PDFPage
 from pdfminer3.pdfinterp import PDFResourceManager
 from pdfminer3.pdfinterp import PDFPageInterpreter
-from pdfminer3.converter import PDFPageAggregator
 from pdfminer3.converter import TextConverter
 
-import shutup
 import random
 import requests
-from pathlib import Path
-import pandas as pd
+
 import json
-import uuid
-from tqdm import tqdm
-from .utils import *
+
 from datetime import date
 from metapub import FindIt
 from bs4 import BeautifulSoup
 from scidownl import scihub_download
-from datetime import date
 
 
 def preprocess_text(sentence):
@@ -181,6 +172,7 @@ def pdf_links(self, pmid):
             data[single_link.text.strip()] = single_link['href']
         return data
     except Exception as e:
+        print(e)
         return {'data': None}
 
 
@@ -262,10 +254,6 @@ def get_pdf(self, pmids, save=False, scihub=True):
         'not_downloaded': not_downloaded
     }, indent=3)
 
-def get_date(self):
-    currentDate = date.today()
-    today = currentDate.strftime('%Y/%m/%d')
-    return today
 
 def write_json(self, path_name, data, name):
     """Write json data"""
@@ -273,6 +261,7 @@ def write_json(self, path_name, data, name):
     with open(f'{path_name}{name}.json', 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
     return 0
+
 
 def get_records(self, query=None):
     """get fetch result and ids from ncbi website using api"""
@@ -292,9 +281,10 @@ def get_records(self, query=None):
             'webenv': webenv,
             'search_data': search_data}
 
+
 def fetch(self, query,
           max_documents=None):
-    """main function to do multi task -> fetch ids, based on ids fetch abstracts"""
+    """function to do multi task -> fetch ids, based on ids fetch abstracts"""
 
     all_records = get_records(self, query)
     webenv = all_records['webenv']
