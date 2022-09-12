@@ -14,7 +14,12 @@ from .utils import fetch, xml2df, get_pdf, get_final_data
 
 class LazyPubmed(object):
 
-    def __init__(self, folder_name='pubmed_data', api_key=''):
+    def __init__(self, title_query,
+                 folder_name='pubmed_data',
+                 api_key='',
+                 max_documents=None,
+                 download_pdf=True,
+                 scihub=False):
 
         # creating folders for storing data
         # ---------------------------------------------------------
@@ -51,8 +56,14 @@ class LazyPubmed(object):
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36 OPR/88.0.4412.27',
         ]
 
+        final_df = self.download_articles(title_query,
+                                        max_documents=max_documents,
+                                        download_pdf=download_pdf,
+                                        scihub=scihub)
+        self.final_df = final_df
 
-    def pubmed_download(self, query,
+
+    def download_articles(self, query,
                         max_documents=None,
                         download_pdf=True,
                         scihub=False,
@@ -67,7 +78,7 @@ class LazyPubmed(object):
         pids = list(set(list(final_df['pmid'])))
 
         if download_pdf:
-            get_pdf(self,pids, save=True, scihub=scihub)
+            get_pdf(self, pids, save=True, scihub=scihub)
             dart = get_final_data(self.raw_pdf_path)
             dart = dart[dart['pmid'].notna()]
             dart['pmid'] = dart['pmid'].apply(lambda x: int(x))
@@ -76,29 +87,29 @@ class LazyPubmed(object):
         final_df.to_csv(f'{self.final_df}final_df.csv')
         return final_df
 
-    def pubmed_qa(self, title_query,
-                  qa_query, max_documents=None,
-                  download_pdf=True,
-                  scihub=False):
-        final_df = self.pubmed_download(title_query,
-                                        max_documents=max_documents,
-                                        download_pdf=download_pdf,
-                                        scihub=scihub)
+    def pubmed_ner(self):
+        final_df = self.final_df
+        from nfmodelapis.text.ner import NERPipeline
+        ner = NERPipeline(final_df)
+        ents = ner.batch_ner('pdf_content')
+        return ents
+
+    def pubmed_qa(self, 
+                  qa_query):
+        
+        final_df = self.final_df
+
         from nfmodelapis.text.question_answering import QAPipeline
         pipe = QAPipeline(final_df)
         res = pipe.batch_qa(qa_query, 'pdf_content')
         return res
 
-    def pubmed_summarize(self,
-                         title_query,
-                         max_documents=None,
-                         download_pdf=True,
-                         scihub=False):
-        final_df = self.pubmed_download(title_query,
-                                        max_documents=max_documents,
-                                        download_pdf=download_pdf,
-                                        scihub=scihub)
+    def pubmed_summarize(self):
+        final_df = self.final_df
+
         from nfmodelapis.text.summarization import SummarizationPipeline
         pipe = SummarizationPipeline(final_df)
         res = pipe.batch_summarize('pdf_content')
         return res
+
+
