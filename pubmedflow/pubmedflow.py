@@ -87,7 +87,7 @@ class LazyPubmed(object):
         final_df.to_csv(f'{self.final_df}final_df.csv')
         return final_df
 
-    def pubmed_ner(self):
+    def pubmed_entity_extraction(self):
         final_df = self.final_df
         from nfmodelapis.text.ner import NERPipeline
         ner = NERPipeline(final_df)
