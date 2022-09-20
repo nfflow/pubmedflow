@@ -39,49 +39,38 @@ import eutils
 from pubmedflow import LazyPubmed
 
 
-pb        = LazyPubmed(folder_name=folder_name)
-df_result = pb.pubmed_download(query         = 'Chronic',
-                             key           = "api_key",
-                             max_documents = 2,
-                             download_pdf  = True, 
-                             scihub        = False)
+pb        = LazyPubmed(title_query,
+                 folder_name='pubmed_data',
+                 api_key='',
+                 max_documents=None,
+                 download_pdf=True,
+                 scihub=False)
                     
 ```
-#### Download articles and do question answering on the downloaded text to get answer spans from each article:
+#### Do question answering on the downloaded text to get answer spans from each article:
 
 ```python
 
-import eutils
-from pubmedflow import LazyPubmed
-
-
-pb        = LazyPubmed(folder_name=folder_name)
-qa_results = pb.pubmed_qa(title_query = 'Chronic',
-                          qa_query = 'What are the chronic diseases',
-                          key      = "api_key",
-                          max_documents = 2,
-                          download_pdf  = True, 
-                          scihub        = False)
+qa_results = pb.pubmed_qa(qa_query = 'What are the chronic diseases',)
  print(qa_results)
  ```
  
- #### Download articles and summarise each of them
+ #### Summarise each of them
  
  ```python
  
-import eutils
-from pubmedflow import LazyPubmed
-
-
-pb        = LazyPubmed(folder_name=folder_name)
-summ_results = pb.pubmed_summarise(title_query='Chronic',
-                                  qa_query='What are the chronic diseases',
-                                  key= "api_key",
-                                  max_documents = 2,
-                                  download_pdf = True, 
-                                  scihub = False)
+summ_results = pb.pubmed_summarise()
  print(summ_results)
  ```
+ 
+  #### Perform entity extraction on each of them
+ 
+ ```python
+ 
+ents = pb.pubmed_entity_extraction()
+ print(ents)
+ ```
+ 
  
 
 
