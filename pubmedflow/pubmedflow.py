@@ -94,9 +94,9 @@ class LazyPubmed(object):
         ents = ner.batch_ner('pdf_content')
         return ents
 
-    def pubmed_qa(self, 
+    def pubmed_qa(self,
                   qa_query):
-        
+
         final_df = self.final_df
 
         from nfmodelapis.text.question_answering import QAPipeline
