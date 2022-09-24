@@ -21,6 +21,17 @@
 
 - Follow this [tutorial](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/#:~:text=To%20create%20the%20key%2C%20go,and%20copy%20the%20resulting%20key)
 
+## Installation
+
+### From source
+```python
+python setup.py install
+```
+OR
+```
+pip install git+https://github.com/nfflow/pubmedflow
+```
+
 ## How to use api?
 
 Arguments:   
