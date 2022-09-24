@@ -94,7 +94,7 @@ class LazyPubmed(object):
 
         final_df = self.final_df
         pdf_content = [i for i in final_df['pdf_content'] if isinstance(i,
-                                                                            str)]
+                                                                        str)]
         import nltk
         nltk.download('punkt')
         from nltk.tokenize import sent_tokenize
