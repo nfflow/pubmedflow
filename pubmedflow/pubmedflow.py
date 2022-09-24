@@ -87,6 +87,36 @@ class LazyPubmed(object):
         final_df.to_csv(f'{self.final_df}final_df.csv')
         return final_df
 
+    def pubmed_unsupervised_learning(self,
+                                     model_name='sentence-transformers/all-mpnet-base-v2',
+                                     model_output_path='pubmedflow_model',
+                                     model_architecture='ct'):
+
+        final_df = self.final_df
+        pdf_content = [i for i in final_df['pdf_content'] if isinstance(i,
+                                                                            str)]
+        import nltk
+        nltk.download('punkt')
+        from nltk.tokenize import sent_tokenize
+        train_sentences = []
+        for text in pdf_content:
+            train_sentences += sent_tokenize(text)
+
+        if len(train_sentences) > 0:
+            print(train_sentences)
+            train_df = pd.DataFrame({'text': train_sentences})
+
+            from nfmodelapis.text.SentenceEmbedder import ModelSelect
+            trainer = ModelSelect(model_name,
+                                  model_output_path,
+                                  model_architecture=model_architecture
+                                  ).return_trainer()
+            trainer.train(data=train_df)
+        else:
+            raise Exception('''No data collected to train.
+                            Check the search parameters to
+                            collect more data''')
+
     def pubmed_entity_extraction(self):
         final_df = self.final_df
         from nfmodelapis.text.ner import NERPipeline
