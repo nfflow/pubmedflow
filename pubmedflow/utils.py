@@ -71,9 +71,8 @@ def get_pdftext_content(pdf_name):
     t_join = " ".join(t)
     if 'References' in t_join:
         t_join = "".join(t_join.split('References')[:-1])
-    final = preprocess_text(t_join)
 
-    return final
+    return t_join
 
 
 def get_final_data(folder_name):
