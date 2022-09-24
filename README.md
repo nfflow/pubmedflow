@@ -62,7 +62,7 @@ pb        = LazyPubmed(title_query,
 ### Perform unsupervised learning to make a pre-trained model from the collected data:
 
 ```python
-pb.pubmed_unsupervised_learning(model_name='sentence-transformers/all-mpnet-base-v2',
+pb.pubmed_train(model_name='sentence-transformers/all-mpnet-base-v2',
                                      model_output_path='pubmedflow_model',
                                      model_architecture='ct')
 ```
