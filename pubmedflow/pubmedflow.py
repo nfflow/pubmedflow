@@ -87,10 +87,10 @@ class LazyPubmed(object):
         final_df.to_csv(f'{self.final_df}final_df.csv')
         return final_df
 
-    def pubmed_unsupervised_learning(self,
-                                     model_name='sentence-transformers/all-mpnet-base-v2',
-                                     model_output_path='pubmedflow_model',
-                                     model_architecture='ct'):
+    def pubmed_train(self,
+                     model_name='sentence-transformers/all-mpnet-base-v2',
+                     model_output_path='pubmedflow_model',
+                     model_architecture='ct'):
 
         final_df = self.final_df
         pdf_content = [i for i in final_df['pdf_content'] if isinstance(i,
