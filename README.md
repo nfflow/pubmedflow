@@ -22,6 +22,11 @@
 - Follow this [tutorial](https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/#:~:text=To%20create%20the%20key%2C%20go,and%20copy%20the%20resulting%20key)
 
 ## Installation
+### From pypi
+
+```
+pip install pubmedflow
+```
 
 ### From source
 ```python
