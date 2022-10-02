@@ -13,7 +13,7 @@ install_requires = ["shutup",
                     "pubmed_parser"]
 setuptools.setup(
     name="pubmedflow",
-    version="0.0.1",
+    version="0.0.2",
     author="Aditya Ura",
     author_email="aadityaura@gmail.com",
     description="Data Collection from pubmed made easy",
