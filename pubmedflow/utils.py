@@ -11,6 +11,7 @@ from tqdm import tqdm
 import io
 import uuid
 import glob
+import gzip
 
 from pdfminer3.layout import LAParams
 from pdfminer3.pdfpage import PDFPage
@@ -310,9 +311,8 @@ def fetch(self, query,
             fetch_r = requests.post(payload, verify=False)
             pre_name = f'{self.raw_abs_path}/pubmed_batch_{u_id}_{str(i)}_to_{str(i+all_rec)}.xml'
 
-            f = open(pre_name, 'wb')
-            f.write(fetch_r.content)
-            f.close()
+            with gzip.open(pre_name, 'wb') as f:
+                f.write(fetch_r.content)
 
             meta_data['uid'] = u_id
             meta_data['query'] = query
