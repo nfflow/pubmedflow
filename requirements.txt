@@ -1,10 +1,10 @@
 beautifulsoup4==4.14.3
-eutils==0.6.1
+lxml==6.1.0
 metapub==0.7.4
 numpy==2.4.4
 pandas==3.0.2
 pdfminer3==2018.12.3.0
 pubmed_parser==0.5.1
+requests==2.34.2
 scidownl==1.0.2
-setuptools==82.0.1
 tqdm==4.67.3
