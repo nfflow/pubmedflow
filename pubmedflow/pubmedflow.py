@@ -45,32 +45,30 @@ class LazyPubmed(object):
                                   exist_ok=True)
         # ---------------------------------------------------------
         self.user_agent_list = [
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',  # noqa: E501
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',  # noqa: E501
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',  # noqa: E501
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',  # noqa: E501
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',  # noqa: E501
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36 OPR/88.0.4412.27',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36 OPR/88.0.4412.27',  # noqa: E501
         ]
 
         final_df = self.download_articles(title_query,
-                                        max_documents=max_documents,
-                                        download_pdf=download_pdf,
-                                        scihub=scihub)
+                                          max_documents=max_documents,
+                                          download_pdf=download_pdf,
+                                          scihub=scihub)
         self.final_df = final_df
 
-
     def download_articles(self, query,
-                        max_documents=None,
-                        download_pdf=True,
-                        scihub=False,
-                        ):
+                          max_documents=None,
+                          download_pdf=True,
+                          scihub=False):
         """function to fetch ids, fetch abstracts and fetch respective pdf files"""
 
-        fetch_ids = fetch(self,query, max_documents=max_documents)
+        fetch(self, query, max_documents=max_documents)
         final_df = xml2df(self.raw_abs_path, self.xml2pdf_path)
         final_df = final_df[final_df['pmid'].notna()]
         final_df['pmid'] = final_df['pmid'].apply(lambda x: int(x))
@@ -141,5 +139,3 @@ class LazyPubmed(object):
         pipe = SummarizationPipeline(final_df)
         res = pipe.batch_summarize('pdf_content')
         return res
-
-

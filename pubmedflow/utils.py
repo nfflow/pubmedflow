@@ -98,7 +98,7 @@ def get_final_data(folder_name):
             else:
                 df_data['pdf_content'].append('')
 
-        except Exception as e:
+        except Exception:
             pass
 
     df_data = pd.DataFrame(df_data)
@@ -246,7 +246,7 @@ def get_pdf(self, pmids, save=False, scihub=True):
                 else:
                     not_downloaded[pmid] = pdf_source
 
-        except Exception as e:
+        except Exception:
             pass
 
     return json.dumps({
@@ -267,9 +267,9 @@ def get_records(self, query=None):
     """get fetch result and ids from ncbi website using api"""
 
     if query:
-        search_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?sort=relevance&db=pubmed&term={query}&mindate=1800/01/01&maxdate={get_date(self)}&usehistory=y&retmode=json"
+        search_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?sort=relevance&db=pubmed&term={query}&mindate=1800/01/01&maxdate={get_date(self)}&usehistory=y&retmode=json"  # noqa: E501
     else:
-        search_url = f"https://eutils.ncbi.nlm.nih.gov/entrdefez/eutils/esearch.fcgi?db=pubmed&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"
+        search_url = f"https://eutils.ncbi.nlm.nih.gov/entrdefez/eutils/esearch.fcgi?db=pubmed&mindate=1800/01/01&maxdate={self.get_date()}&usehistory=y&retmode=json"  # noqa: E501
 
     search_r = requests.post(search_url, verify=False)
     search_data = search_r.json()
@@ -292,9 +292,9 @@ def fetch(self, query,
 
     if max_documents:
         all_rec = max_documents
-        fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={self.key}&retmax={max_documents}&retmode=xml&query_key=1&webenv="+webenv
+        fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={self.key}&retmax={max_documents}&retmode=xml&query_key=1&webenv="+webenv  # noqa: E501
     else:
-        fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={self.key}&retmax=9999&retmode=xml&query_key=1&webenv="+webenv
+        fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&api_key={self.key}&retmax=9999&retmode=xml&query_key=1&webenv="+webenv  # noqa: E501
 
     print("-------------------------------------------\n")
     print(f" Fetching total documents -> {all_rec}..\n")
